@@ -6,11 +6,9 @@ export const AppReducer = (state, action) => {
     switch (action.type) {
         case 'ADD_EXPENSE':
             let total_budget = 0;
-            total_budget = state.expenses.reduce(
-                (previousExp, currentExp) => {
-                    return previousExp + currentExp.cost
-                },0
-            );
+            total_budget = state.expenses.reduce((previousExp, currentExp) => {
+                return previousExp + currentExp.cost;
+            }, 0);
             total_budget = total_budget + action.payload.cost;
             action.type = "DONE";
             if(total_budget <= state.budget) {
@@ -59,7 +57,20 @@ export const AppReducer = (state, action) => {
             };
         case 'SET_BUDGET':
             action.type = "DONE";
-            state.budget = action.payload;
+            let totalExpenses;
+
+            if (state.expenses) {
+                totalExpenses = state.expenses.reduce((total, item) => {
+                    return (total += item.cost);
+                }, 0);
+            }
+            
+            if (state.budget < totalExpenses) {
+                alert('You cannot reduce the budget value lower than the spending!');
+            }
+            else {
+                state.budget = action.payload;
+            }
 
             return {
                 ...state,
@@ -101,7 +112,7 @@ export const AppProvider = (props) => {
 
     if (state.expenses) {
             const totalExpenses = state.expenses.reduce((total, item) => {
-            return (total = total + item.cost);
+            return (total += item.cost);
         }, 0);
         remaining = state.budget - totalExpenses;
     }
